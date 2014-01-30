@@ -1,0 +1,15 @@
+general:
+ logfile: 'elasticsump.log'
+ compression: True
+s3:
+ s3_bucket: ''
+ aws_access_key    : ''
+ aws_secret_key    : ''
+es:
+ timeout: 3.5
+ index: 'indexname'
+ filter: ''
+ limit: ''
+servers:
+   - 'node1:9200'
+   - 'node2:9200'

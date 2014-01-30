@@ -1,0 +1,4 @@
+csv/*.csv
+config.yml
+elasticsump.log
+row.example.json

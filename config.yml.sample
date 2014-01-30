@@ -10,6 +10,8 @@ es:
  index: 'indexname'
  filter: ''
  limit: ''
+ date_column: 'timestamp'
+ date_format: '%Y-%m-%d %H:%M:%S'
 servers:
    - 'node1:9200'
    - 'node2:9200'

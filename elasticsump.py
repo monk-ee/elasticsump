@@ -1,14 +1,14 @@
 #!/usr/bin/env python
 __author__ = 'monk-ee'
 
-"""This module .
-probably need to stream io this
+"""This module hits an elasticsearch index - flattens the data and puts up on s3 ready for redshiftiness.
 """
 from pyes import *
 import csv
 import logging
 import yaml
 import boto
+import time
 
 
 
@@ -58,14 +58,16 @@ class Sump:
             self.headers_nest.update({header_hash: header})
             #write to the appropriate file here
             self.csvme(header_hash,header)
-            print header_hash
         #output values into the appropriate nest
-        for value in flatdict.values():
+        # need to convert timestamps to sql friendly format
+        for key,value in flatdict.iteritems():
             try:
                 #this situation: UnicodeEncodeError: 'ascii' codec can't encode characters in position 0-11: ordinal not in range(128)
                 value.encode('ascii', 'ignore')
             except:
                 pass
+            if key == self.config['es']['date_column']:
+                value = time.strftime(self.config['es']['date_format'], time.localtime(value / 1e3))
             csvrow.append(value)
         self.csvme(header_hash,csvrow)
 
@@ -76,6 +78,7 @@ class Sump:
         except:
             #too hard throw it away
             pass
+
     def flatten(self,d):
         def items():
             for key, value in d.items():
@@ -86,6 +89,15 @@ class Sump:
                 else:
                     yield key, value
         return dict(items())
+
+    def compresscsv(self):
+        #compress all files in csv folder
+        pass
+
+
+    def sendtos3(self):
+        #pop the files into s3
+        pass
 
 if __name__ == "__main__":
     elasticsump = Sump()

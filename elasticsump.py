@@ -97,7 +97,27 @@ class Sump:
 
     def sendtos3(self):
         #pop the files into s3
-        pass
+        c = boto.connect_s3(aws_access_key_id=self.config['s3']['aws_access_key_id'],
+                            aws_secret_access_key=self.config['s3']['aws_access_key_id'])
+        b = c.get_bucket(self.config['s3']['s3_bucket'])
+        if os.path.isdir('csv/'):
+            for root, dirs, files in os.walk('csv/'):
+                for ignore in ignore_dirs:
+                    if ignore in dirs:
+                        dirs.remove(ignore)
+                for file in files:
+                    fullpath = os.path.join(root, file)
+                    key_name = get_key_name(fullpath, prefix)
+                    if not quiet:
+                        print 'Copying %s to %s/%s' % (file, self.config['s3']['s3_bucket'] key_name)
+                    if not no_op:
+                        k = b.new_key(key_name)
+                        k.set_contents_from_filename(fullpath, cb=cb, num_cb=num_cb)
+                    total += 1
+        elif os.path.isfile(path):
+            k = b.new_key(os.path.split('csv/')[1])
+            k.set_contents_from_filename('csv/')
+
 
 if __name__ == "__main__":
     elasticsump = Sump()
